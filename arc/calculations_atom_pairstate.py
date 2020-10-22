@@ -1,8 +1,8 @@
 # @Author: ogi
-# @Date:   2020-07-22T15:42:26-07:00
+# @Date:   2020-07-22T18:27:49-07:00
 # @Email:  ognjenm@stanford.edu
 # @Last modified by:   ogi
-# @Last modified time: 2020-07-22T18:10:48-07:00
+# @Last modified time: 2020-10-22T15:30:38-07:00
 
 
 
@@ -1334,13 +1334,13 @@ class PairStateInteractions:
                     stateCom = compositeState(statePart1, statePart2)
 
                     if (matRIndex==0):
-                        zeemanShift = (self.atom.getZeemanEnergyShift(
+                        zeemanShift = (self.atom1.getZeemanEnergyShift(
                                            self.basisStates[i][1],
                                            self.basisStates[i][2],
                                            self.basisStates[i][3],
                                            self.Bz,
                                            s=self.s1) + \
-                                       self.atom.getZeemanEnergyShift(
+                                       self.atom2.getZeemanEnergyShift(
                                            self.basisStates[i][5],
                                            self.basisStates[i][6],
                                            self.basisStates[i][7],
