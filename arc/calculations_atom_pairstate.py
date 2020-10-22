@@ -1,11 +1,3 @@
-# @Author: ogi
-# @Date:   2020-07-22T18:27:49-07:00
-# @Email:  ognjenm@stanford.edu
-# @Last modified by:   ogi
-# @Last modified time: 2020-10-22T15:30:38-07:00
-
-
-
 # -*- coding: utf-8 -*-
 
 """
