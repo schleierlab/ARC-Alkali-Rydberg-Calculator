@@ -1210,7 +1210,7 @@ class PairStateInteractions:
 
         self.__initializeDatabaseForMemoization()
 
-        # save call parameters
+        #save call parameters
         self.theta = theta; self.phi = phi; self.nRange = nRange;
         self.lrange = lrange; self.energyDelta = energyDelta
         self.Bz = Bz; self.Ez = Ez;
@@ -1846,7 +1846,7 @@ class PairStateInteractions:
         return stateString
 
     def plotLevelDiagram(self,  highlightColor='red',
-                         highlightScale='linear'):
+                         highlightScale='linear',vmax=1.):
         """
             Plots pair state level diagram
 
@@ -1866,11 +1866,11 @@ class PairStateInteractions:
                                                 ['0.9', highlightColor])
 
         if highlightScale == 'linear':
-            cNorm = matplotlib.colors.Normalize(vmin=0., vmax=1.)
+            cNorm = matplotlib.colors.Normalize(vmin=0., vmax=vmax)
         elif highlightScale == 'log-2':
-            cNorm = matplotlib.colors.LogNorm(vmin=1e-2, vmax=1)
+            cNorm = matplotlib.colors.LogNorm(vmin=1e-2, vmax=vmax)
         elif highlightScale == 'log-3':
-            cNorm = matplotlib.colors.LogNorm(vmin=1e-3, vmax=1)
+            cNorm = matplotlib.colors.LogNorm(vmin=1e-3, vmax=vmax)
         else:
             raise ValueError("Only 'linear', 'log-2' and 'log-3' are valid "
                              "inputs for highlightScale")
@@ -1904,7 +1904,7 @@ class PairStateInteractions:
         self.ax.scatter(colorfulX, colorfulY, s=10, c=colorfulState, linewidth=0,
                         norm=cNorm, cmap=rvb, zorder=2, picker=5)
         cax = self.fig.add_axes([0.91, 0.1, 0.02, 0.8])
-        cb = matplotlib.colorbar.ColorbarBase(cax, cmap=rvb, norm=cNorm)
+        self.cb = matplotlib.colorbar.ColorbarBase(cax, cmap=rvb, norm=cNorm)
 
         if (self.drivingFromState[0] == 0):
             # colouring is based on the contribution of the original pair state here
@@ -1933,10 +1933,10 @@ class PairStateInteractions:
                                                     s=self.s2),
                               int(round(self.m2, 0)))
 
-            cb.set_label(label)
+            self.cb.set_label(label)
         else:
             # colouring is based on the coupling to different states
-            cb.set_label(r"$(\Omega_\mu/\Omega)^2$")
+            self.cb.set_label(r"$(\Omega_\mu/\Omega)^2$")
 
         self.ax.set_xlabel(r"Interatomic distance, $R$ ($\mu$m)")
         self.ax.set_ylabel(r"Pair-state relative energy, $\Delta E/h$ (GHz)")
