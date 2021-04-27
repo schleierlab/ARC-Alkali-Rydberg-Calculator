@@ -214,7 +214,7 @@ class DressedInteractions(PairStateInteractions):
         # calculates Rabi frequency of coupling from |up up> to Rydberg pair eigenstate
         # this gives an array where each row corresponds to all eigenstates at a given distance
         self.eigVecs = np.array(self.eigVecs)
-        self.pairRabiFreqs = np.zeros((len(self.r),self.eigVecs.shape[1]*self.mIMultiplicity))
+        self.pairRabiFreqs = np.zeros((len(self.r),self.eigVecs.shape[1]*self.mIMultiplicity), dtype=complex)
 
         for basisStateIndex, basisState in enumerate(self.extendedBasisStates):
             [n1,l1,j1,mj1,n2,l2,j2,mj2,mi1,mi2] = basisState
@@ -226,7 +226,7 @@ class DressedInteractions(PairStateInteractions):
             #calculate overlap between the basisState and all eigenstates
             #for each distance, this overlap will have nEig*self.mIMultiplicity
             #numbers, due to a larger basis when considering mI states
-            overlap =  np.zeros((len(self.r),self.eigVecs.shape[1]*self.mIMultiplicity))
+            overlap =  np.zeros((len(self.r),self.eigVecs.shape[1]*self.mIMultiplicity), dtype=complex)
             mi1Idx = self.mIlist.index(mi1)
             mi2Idx = self.mIlist.index(mi2)
             overlap[:,mi1Idx*len(self.mIlist)+mi2Idx::self.mIMultiplicity] = \
