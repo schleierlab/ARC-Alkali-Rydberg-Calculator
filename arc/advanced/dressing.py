@@ -10,7 +10,7 @@ class DressedInteractions(PairStateInteractions):
 
     #currently only supports interaction between identical Alkali atoms
     def __init__(self, atom, n, l, j,
-                 s=0.5):
+                 s=0.5, interactionsUpTo=1):
         """Initialize the dressed state calculation. Both "atoms" are defined to be in
         the same state as we are dressing to only one state identical to boht atoms.
 
@@ -56,8 +56,7 @@ class DressedInteractions(PairStateInteractions):
         #pair state (n,l,j,0.5) (n,l,j,-0.5) defines the zero pair state energy
 
         super().__init__(atom, n, l, j, n, l, j, m1, m2,
-                     interactionsUpTo=1,
-                     s=s,
+                     s=s, interactionsUpTo=interactionsUpTo,
                      s2=None, atom2=None)
 
     def defineBasis(self,theta,phi, dn,dl, deltaMax, Bz = 0,progressOutput=False,debugOutput=False):
