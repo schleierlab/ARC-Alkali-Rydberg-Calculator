@@ -52,7 +52,7 @@ sqlite3.register_adapter(np.int64, int)
 sqlite3.register_adapter(np.int32, int)
 
 DPATH = os.path.join(os.path.expanduser('~'), '.arc-data')
-__arc_data_version__ = 3
+__arc_data_version__ = 6
 
 
 def setup_data_folder():
@@ -653,9 +653,13 @@ class AlkaliAtom(object):
             program will try use NIST energy value, if such exists,
             falling back to energy calculation with quantum defects if
             the measured value doesn't exist. For `preferQuantumDefects` =True,
-            program will always calculate energies from quantum defects
+            program will calculate energies from quantum defects
             (useful for comparing quantum defect calculations with measured
-            energy level values).
+            energy level values) if the principal quantum number of the
+            requested state is larger than the minimal quantum principal quantum
+            number `self.minQuantumDefectN` which sets minimal quantum number
+            for which quantum defects still give good estimate of state energy
+            (below this value saved energies will be used if existing).
 
             Args:
                 n (int): principal quantum number
@@ -752,6 +756,14 @@ class AlkaliAtom(object):
                 j2 (float): total angular momentum of state 2
                 s (float): optional, total spin angular momentum of state 1.
                     By default 0.5 for Alkali atoms.
+                useLiterature (bool): optional, should literature values for
+                    dipole matrix element be used if existing? If true,
+                    compiled values stored in `literatureDMEfilename` variable
+                    for a given atom (file is stored locally at ~/.arc-data/),
+                    will be checked, and if the value is found, selects the
+                    value with smallest error estimate (if there are multiple
+                    entries). If no value is found, it will default to numerical
+                    integration of wavefunctions. By default True.
 
             Returns:
                 float: dipole matrix element (:math:`a_0 e`).
@@ -2187,10 +2199,17 @@ def saveCalculation(calculation, fileName):
         calculation.fig = 0
 
         # close database connections
-        atomDatabaseConn = calculation.atom.conn
-        atomDatabaseC = calculation.atom.c
-        calculation.atom.conn = False
-        calculation.atom.c = False
+        atomNumber = 0
+        if hasattr(calculation, 'atom'):
+            atomNumber = 1
+            atomDatabaseConn1 = calculation.atom.conn
+            calculation.atom.conn = False
+        elif hasattr(calculation, 'atom1'):
+            atomNumber = 2
+            atomDatabaseConn1 = calculation.atom1.conn
+            calculation.atom1.conn = False
+            atomDatabaseConn2 = calculation.atom2.conn
+            calculation.atom2.conn = False
 
         output = gzip.GzipFile(fileName, 'wb')
         pickle.dump(calculation, output, pickle.HIGHEST_PROTOCOL)
@@ -2198,8 +2217,11 @@ def saveCalculation(calculation, fileName):
 
         calculation.ax = ax
         calculation.fig = fig
-        calculation.atom.conn = atomDatabaseConn
-        calculation.atom.c = atomDatabaseC
+        if atomNumber == 1:
+            calculation.atom.conn = atomDatabaseConn1
+        elif atomNumber == 2:
+            calculation.atom1.conn = atomDatabaseConn1
+            calculation.atom2.conn = atomDatabaseConn2
     except Exception as ex:
         print(ex)
         print("ERROR: saving of the calculation failed.")
@@ -2240,7 +2262,11 @@ def loadSavedCalculation(fileName):
           + fileName + "' successful.")
 
     # establish conneciton to the database
-    calculation.atom._databaseInit()
+    if hasattr(calculation, 'atom'):
+        calculation.atom._databaseInit()
+    elif hasattr(calculation, 'atom'):
+        calculation.atom1._databaseInit()
+        calculation.atom2._databaseInit()
 
     return calculation
 

@@ -11,6 +11,7 @@
 from __future__ import print_function
 
 from .alkali_atom_functions import printStateString, _EFieldCoupling, printStateLetter, printStateStringLatex
+from .divalent_atom_functions import DivalentAtom
 import datetime
 import sqlite3
 import matplotlib
@@ -54,6 +55,11 @@ def Ylm(l, m, theta, phi):
 class Wavefunction:
     r"""
         Calculates and plots electron wavefunctions.
+
+       For an example see `wavefunction plotting example snippet`_.
+
+       .. _`wavefunction plotting example snippet`:
+           ./ARC_3_0_introduction.html#Wavefunction-calculations-for-Alkali-atom-Rydberg-states
 
         Args:
             atom: atom type considered (for example :obj:`Rubidum87()`)
@@ -676,7 +682,10 @@ class StarkMap:
 
             for tl in xrange(min(maxL + 1, tn)):
                 for tj in np.linspace(tl - s, tl + s, round(2 * s + 1)):
-                    if abs(mj) - 0.1 <= tj:
+                    if (abs(mj) - 0.1 <= tj) and (
+                        tn >= self.atom.groundStateN
+                        or [tn, tl, tj] in self.atom.extraLevels
+                            ):
                         states.append([tn, tl, tj, mj])
 
         dimension = len(states)
@@ -964,10 +973,11 @@ class StarkMap:
         else:
             raise ValueError("Unsupported export format (.%s)." % format)
 
-    def plotLevelDiagram(self, units=1, highlighState=True, progressOutput=False,
+
+    def plotLevelDiagram(self, units='cm', highlightState=True, progressOutput=False,
                          debugOutput=False, highlightColour='red',
                          addToExistingPlot=False):
-        """
+        r"""
             Makes a plot of a stark map of energy levels
 
             To save this plot, see :obj:`savePlot`. To print this plot see
@@ -976,10 +986,13 @@ class StarkMap:
             respectively.
 
             Args:
-                units (:obj:`int`,optional): possible values {1,2} ; if the
-                    value is 1 (default) Stark diagram will be plotted in
-                    energy units cm :math:`{}^{-1}`; if value is 2, Stark
-                    diagram will be plotted as energy :math:`/h` in units of GHz
+                units (:obj:`char`,optional): possible values {'*cm*','GHz','eV'};
+                    [case insensitive] if the string contains 'cm' (default) Stark
+                    diagram will be plotted in energy units cm :math:`{}^{-1}`; if
+                    value is 'GHz', Stark diagram will be plotted as energy
+                    :math:`/h` in units of GHz; if the value is 'eV', Stark diagram
+                    will be plotted as energy in units eV.
+
                 highlightState (:obj:`bool`, optional): False by default. If
                     True, scatter plot colour map will map in red amount of
                     original state for the given eigenState
@@ -993,8 +1006,23 @@ class StarkMap:
         """
         rvb = LinearSegmentedColormap.from_list('mymap',
                                                 ['0.9', highlightColour, 'black'])
+        # for back-compatibilirt with versions <= 3.0.11
+        # where units were chosen as integer 1 or 2
+        if not isinstance(units, str):
+            units = ["ev", "ghz", "cm"][units-1]
+        if units.lower() == 'ev':
+            self.units = 'eV'
+            self.scaleFactor = 1e9 * C_h / C_e
+            Elabel = '';
+        elif units.lower() == 'ghz':
+            self.units = 'GHz'
+            self.scaleFactor = 1
+            Elabel = '/h'
+        elif 'cm' in units.lower():
+            self.units = 'cm$^{-1}$'
+            self.scaleFactor = 1e9 / (C_c * 100)
+            Elabel = '/(h c)'
 
-        self.units = units
         self.addToExistingPlot = addToExistingPlot
 
         if progressOutput:
@@ -1033,64 +1061,34 @@ class StarkMap:
         y = y[sortOrder]
         yState = yState[sortOrder]
 
-        if (units == 1):
-            # in cm^-1
-
-            if not highlighState:
-                self.ax.scatter(eFieldList / 100., y * 0.03336,
-                                s=1, color="k", picker=5)
-            else:
-                cm = rvb
-                cNorm = matplotlib.colors.Normalize(vmin=0., vmax=1.)
-                self.ax.scatter(eFieldList / 100, y * 0.03336,
-                                c=yState, s=5, norm=cNorm, cmap=cm, lw=0, picker=5)
-                if not existingPlot:
-                    cax = self.fig.add_axes([0.91, 0.1, 0.02, 0.8])
-                    cb = matplotlib.colorbar.ColorbarBase(
-                        cax, cmap=cm, norm=cNorm)
-                    if (self.drivingFromState[0] < 0.1):
-                        cb.set_label(r"$|\langle %s | \mu \rangle |^2$" %
-                                     printStateStringLatex(n, l, j,s=self.s))
-                    else:
-                        cb.set_label(r"$( \Omega_\mu | \Omega )^2$")
-
+        if not highlightState:
+            self.ax.scatter(eFieldList / 100., y * self.scaleFactor,
+                            s=1, color="k", picker=5)
         else:
-            # in GHz
+            cm = rvb
+            cNorm = matplotlib.colors.Normalize(vmin=0., vmax=1.)
+            self.ax.scatter(eFieldList / 100, y * self.scaleFactor,
+                            c=yState, s=5, norm=cNorm, cmap=cm, lw=0, picker=5)
+            if not existingPlot:
+                cax = self.fig.add_axes([0.91, 0.1, 0.02, 0.8])
+                cb = matplotlib.colorbar.ColorbarBase(
+                    cax, cmap=cm, norm=cNorm)
+                if (self.drivingFromState[0] < 0.1):
+                    cb.set_label(r"$|\langle %s | \mu \rangle |^2$" %
+                                 printStateStringLatex(n, l, j,s=self.s))
+                else:
+                    cb.set_label(r"$( \Omega_\mu | \Omega )^2$")
 
-            if not highlighState:
-                self.ax.scatter(eFieldList / 100., y,
-                                s=1, color="k", picker=5)  # in GHz
-            else:
-                cm = rvb
-                cNorm = matplotlib.colors.Normalize(vmin=0., vmax=1.)
-                self.ax.scatter(eFieldList / 100., y, c=yState,
-                                s=5, norm=cNorm, cmap=cm, lw=0, picker=5)
-                if not existingPlot:
-                    cax = self.fig.add_axes([0.91, 0.1, 0.02, 0.8])
-                    cb = matplotlib.colorbar.ColorbarBase(cax,
-                                                          cmap=cm, norm=cNorm)
-                    if (self.drivingFromState[0] < 0.1):
-                        cb.set_label(r"$|\langle %s | \mu \rangle |^2$" %
-                                     printStateStringLatex(n, l, j, s=self.s))
-                    else:
-                        cb.set_label(r"$(\Omega_\mu / \Omega )^2$")
 
         self.ax.set_xlabel("Electric field (V/cm)")
 
-        if (units == 1):
-            # in cm^{-1}
-            uppery = self.atom.getEnergy(
-                n, l, j, s=self.s) * C_e / C_h * 1e-9 * 0.03336 + 10
-            lowery = self.atom.getEnergy(
-                n, l, j, s=self.s) * C_e / C_h * 1e-9 * 0.03336 - 10
-            self.ax.set_ylabel("State energy, $E/(h c)$ (cm$^{-1}$)")
-        else:
-            # in GHz
-            uppery = self.atom.getEnergy(n, l, j, s=self.s) * C_e / C_h * 1e-9 + 5
-            lowery = self.atom.getEnergy(n, l, j, s=self.s) * C_e / C_h * 1e-9 - 5
-            self.ax.set_ylabel(r"State energy, $E/h$ (GHz)")
+        eV2GHz = C_e / C_h * 1e-9;
+        halfY  = 300; #GHz, half Y range
+        upperY = (self.atom.getEnergy(n, l, j, s=self.s) * eV2GHz + halfY) * self.scaleFactor
+        lowerY = (self.atom.getEnergy(n, l, j, s=self.s) * eV2GHz - halfY) * self.scaleFactor
+        self.ax.set_ylabel(r"State energy, $E%s$ (%s)"%(Elabel, self.units))
 
-        self.ax.set_ylim(lowery, uppery)
+        self.ax.set_ylim(lowerY, upperY)
         ##
         self.ax.set_xlim(min(eFieldList) / 100., max(eFieldList) / 100.)
         return 0
@@ -1132,10 +1130,7 @@ class StarkMap:
 
     def _onPick(self, event):
         if isinstance(event.artist, matplotlib.collections.PathCollection):
-            if (self.units == 1):
-                scaleFactor = 0.03336
-            else:
-                scaleFactor = 1.0
+            scaleFactor = self.scaleFactor
 
             x = event.mouseevent.xdata * 100.
             y = event.mouseevent.ydata / scaleFactor
@@ -1500,6 +1495,10 @@ class LevelPlot:
                     one spin state by setting for example `sList=[0]``,
                     or both spin states `sList=[0,1]``
         """
+        if (issubclass(type(self.atom), DivalentAtom) and abs(sList[0]-0.5)<0.1):
+            raise ValueError("For divalent atoms requested spin state(s) have "
+                             "to be explicitly specified e.g. sList=[0] or "
+                             "sList=[0,1]")
         # save local copy of the space restrictions
         self.nFrom = nFrom
         self.nTo = nTo
@@ -1515,12 +1514,11 @@ class LevelPlot:
                 l = lFrom
                 if (l==0 and s==1 and n == self.atom.groundStateN):
                     # for ground state S state, there is only singlet
-                    # Todo: check with Strontium people!
                     l += 1
                 while l <= min(lTo, n - 1):
                     for j in np.linspace(l - s, l + s, round(2 * s + 1)):
                         if j > -0.1:
-                            self.listX.append(l + xPositionOffset)
+                            self.listX.append(l - lFrom + xPositionOffset)
                             self.listY.append(self.atom.getEnergy(n, l, j,
                                                                   s=s))
                             self.levelLabel.append([n, l, j, s])
@@ -1536,12 +1534,12 @@ class LevelPlot:
                     # last line means: either is Alkali, when we don't need to
                     # check the spin, or it's divalent, when we do need to check
                     # the spin
-                    self.listX.append(state[1] + xPositionOffset)
+                    self.listX.append(state[1] - lFrom + xPositionOffset)
                     self.listY.append(self.atom.getEnergy(
                         state[0], state[1], state[2], s=s))
                     self.levelLabel.append([state[0], state[1], state[2], s])
 
-            xPositionOffset += lTo + 1
+            xPositionOffset += lTo + 1 - lFrom
 
 
     def makeTransitionMatrix(self, environmentTemperature=0.0, printDecays=True):
@@ -1577,7 +1575,7 @@ class LevelPlot:
             transitionVector[i] = decay
             if printDecays:
                 print("Decay time of ")
-                printState(state1[0], state1[1], state1[2])
+                printStateString(state1[0], state1[1], state1[2])
                 if decay < -1e-20:
                     print("\t is\t", -1.e9 / decay, " ns")
             self.transitionMatrix.append(transitionVector)
@@ -1652,18 +1650,38 @@ class LevelPlot:
             self.fig.savefig(saveInFile)
         plt.show()
 
-    def drawLevels(self):
-        """
+    def drawLevels(self, units='eV'):
+        r"""
             Draws a level diagram plot
+
+            Arg:
+                units (:obj:`char`,optional): possible values {'eV','*cm*','GHz'};
+                    [case insensitive] if the value is 'eV' (default), Stark
+                    diagram will be plotted as energy in units eV; if the string
+                    contains 'cm' Stark diagram will be plotted in energy units cm
+                    :math:`{}^{-1}`; if value is 'GHz', Stark diagram will be
+                    plotted as energy :math:`/h` in units of GHz;
+
         """
         self.fig, self.ax = plt.subplots(1, 1, figsize=(9.0, 11.5))
 
+        if   units.lower() == 'ev':
+            self.scaleFactor = 1
+            self.units = 'eV'
+        elif units.lower() == 'ghz':
+            self.scaleFactor = C_e/C_h*1e-9
+            self.units = 'GHz'
+        elif 'cm' in units.lower():
+            self.scaleFactor = C_e/(C_h*C_c*100)
+            self.units = 'cm$^{-1}$'
+
         i = 0
         while i < len(self.listX):
-            self.ax.plot([self.listX[i] - self.width, self.listX[i] + self.width],
-                         [self.listY[i], self.listY[i]], "b-", picker=4)
+            self.ax.plot([self.listX[i] - self.width,
+                                 self.listX[i] + self.width],
+                         [self.listY[i]*self.scaleFactor, self.listY[i]*self.scaleFactor], "b-", picker=True)
             if (i < len(self.populations) and (self.populations[i] > 1e-3)):
-                self.ax.plot([self.listX[i]], [self.listY[i]],
+                self.ax.plot([self.listX[i]], [self.listY[i]*self.scaleFactor],
                              "ro", alpha=self.populations[i])
 
             i = i + 1
@@ -1673,7 +1691,7 @@ class LevelPlot:
             Shows a level diagram plot
         """
         self.listX = np.array(self.listX)
-        self.ax.set_ylabel("Energy (eV)")
+        self.ax.set_ylabel("Energy (%s)"%self.units)
         self.ax.set_xlim(-0.5 + np.min(self.listX), np.max(self.listX) + 0.5)
 
         # X AXIS
@@ -1685,7 +1703,7 @@ class LevelPlot:
             sNumber  = round(2 * s + 1)
             for l in xrange(self.lFrom, self.lTo + 1):
                 tickNames.append("$^%d %s$" % (sNumber, printStateLetter(l) ) )
-        tickNum = len(self.ax.get_xticklabels())
+        tickNum = len(tickNames)
 
         self.fig.canvas.draw()
         self.ax.set_xticks(np.arange(tickNum))
@@ -1696,6 +1714,7 @@ class LevelPlot:
         plt.show()
 
     def findState(self, x, y):
+        y /= self.scaleFactor
         distance = 100000000.0
         state = [0, 0, 0]
         i = 0
@@ -1725,7 +1744,7 @@ class LevelPlot:
         return -1
 
     def findLine(self, x, y):
-        distance = 1.e19
+        distance = 1.e40
         line = ""
         i = 0
         while i < len(self.spectraLine):
@@ -1745,14 +1764,17 @@ class LevelPlot:
             ydata = thisline.get_ydata()
 
             state = self.findState((xdata[0] + xdata[0]) / 2., ydata[0])
-            if (self.state1[0] == -1 or (state[1] == self.state1[1])):
-                self.state1 = state
-                self.ax.set_title(r"$%s \rightarrow$ " % (printStateStringLatex(
-                    state[0], state[1], state[2], s=state[3])) )
-                self.state2 = [-1, -1, -1]
+
+            if (self.state1[0] == -1 ):
+                if (state[1] != self.state2[1] or state[0]!= self.state2[0]):
+                    self.state1 = state
+                    self.ax.set_title(r"$%s \rightarrow$ " % (printStateStringLatex(
+                        state[0], state[1], state[2], s=state[3])) )
+                    self.state2 = [-1, -1, -1]
             else:
                 title = ""
-                if (state[1] != self.state1[1]) and (state[1] != self.state2[1]):
+
+                if (state[0] != self.state1[0]) or (state[1] != self.state1[1]):
                     title = (r"$ %s \rightarrow %s $ " %
                              (printStateStringLatex(self.state1[0],
                                              self.state1[1],
@@ -1760,7 +1782,15 @@ class LevelPlot:
 
                                 printStateStringLatex(state[0], state[1], state[2],
                                                       s=state[3])))
-                    title = title + (" %.2f nm (%.3f GHz)" %
+                    transitionEnergy = self.atom.getTransitionFrequency(self.state1[0],
+                                                     self.state1[1],
+                                                     self.state1[2],
+                                                     state[0],
+                                                     state[1],
+                                                     state[2],
+                                                     s=self.state1[3],
+                                                     s2=state[3]) * C_h / C_e  # in eV
+                    title = title + (" %.2f nm (%.3f %s)" %
                                      (self.atom.getTransitionWavelength(self.state1[0],
                                                                         self.state1[1],
                                                                         self.state1[2],
@@ -1768,22 +1798,16 @@ class LevelPlot:
                                                                         state[2],
                                                                         s=self.state1[3],
                                                                         s2=state[3]) * 1e9,
-                                      self.atom.getTransitionFrequency(self.state1[0],
-                                                                       self.state1[1],
-                                                                       self.state1[2],
-                                                                       state[0],
-                                                                       state[1],
-                                                                       state[2],
-                                                                       s=self.state1[3],
-                                                                       s2=state[3]) * 1e-9))
+                                       transitionEnergy * self.scaleFactor,
+                                       self.units))
                     self.ax.set_title(title)
-                    self.state1 = [0, 0, 0]
+                    self.state1 = [-1, 0, 0]
+                    self.state2 = state
 
-                self.state2[1] = state[1]
             event.canvas.draw()
 
     def onpick3(self, event):
-        if isinstance(event.artist, Line2D):
+        if isinstance(event.artist, matplotlib.lines.Line2D):
             thisline = event.artist
             xdata = thisline.get_xdata()
             ydata = thisline.get_ydata()
@@ -1813,6 +1837,11 @@ class AtomSurfaceVdW:
 
         This class calculates :math:`C_3` for individual states
         :math:`|i\rangle`.
+
+        See example `atom-surface calculation snippet`_.
+
+        .. _`atom-surface calculation snippet`:
+            ./ARC_3_0_introduction.html#Atom-surface-van-der-Waals-interactions-(C3-calculation)
 
         Args:
             atom (:obj:`AlkaliAtom` or :obj:`DivalentAtom`): specified
@@ -2026,7 +2055,12 @@ class AtomSurfaceVdW:
 
 class OpticalLattice1D:
     r"""
-        Atom properties in optical lattices in 1D
+        Atom properties in optical lattices in 1D.
+
+        See example `optical lattice calculations snippet`_.
+
+        .. _`optical lattice calculations snippet`:
+            ./ARC_3_0_introduction.html#Optical-lattice-calculations-(Bloch-bands,-Wannier-states...)
 
         Args:
             atom: one of AlkaliAtom or DivalentAtom
@@ -2355,7 +2389,8 @@ class DynamicPolarizability:
         self.basis = []
         self.lifetimes = []
 
-        for n1 in np.arange(self.nMin, self.nMax + 1):
+        for n1 in np.arange(max(self.nMin, self.atom.groundStateN),
+                            self.nMax + 1):
             lmin = self.l - 1
             if (lmin < - 0.1):
                 lmin = self.l + 1
@@ -2415,7 +2450,18 @@ class DynamicPolarizability:
                           mj=None
                           ):
         r"""
-            Calculates of scalar, tensor and pondermotive polarizability
+            Calculates of scalar, vector, tensor, core and pondermotive
+            polarizability, and returns state corresponding to the closest
+            transition resonance.
+
+           Note that pondermotive polarisability is calculated as
+           :math:`\alpha_P = e^2 / (2 m_e \omega^2)`, i.e. assumes that the
+           definition of the energy shift in field :math:`E` is
+           :math:`\frac{1}{2}\alpha_P E^2`. For more datils check the
+           preprint  `arXiv:2007.12016`_ that introduced the update.
+
+           .. _`arXiv:2007.12016`:
+               https://arxiv.org/abs/2007.12016
 
             Args:
                 driveWavelength (float): wavelength of driving field
@@ -2428,11 +2474,13 @@ class DynamicPolarizability:
                     for finite transition linewidths caused by finite state
                     lifetimes. By default False.
             Returns:
-                scalar, tensor, pondermotive polarisability of state, and
-                atomic state whose resonance is closest in energy.
+                scalar, vector, tensor, pondermotive polarisability of state,
+                core polarisability and atomic state whose resonance is closest
+                in energy. Returned units depend on `units` parameter
+                (default SI).
         """
 
-        if (accountForStateLifetime and self.lifetimes.length == 0):
+        if (accountForStateLifetime and len(self.lifetimes) == 0):
             for state in self.basis:
                 self.lifetimes.append(self.atom.getStateLifetime(state[0],
                                                                  state[1],
@@ -2525,9 +2573,9 @@ class DynamicPolarizability:
                              + transitionLinewidth**2 / 4)**2
                             + transitionLinewidth**2 * driveEnergy**2)
 
-                    # tensor polarizability vanishes for j=1/2 states
+                    # tensor polarizability vanishes for j=1/2 and j=0 states
                     # because Wigner6j is then zero
-                    if abs(self.j - 0.5) > 0.1:
+                    if self.j > 0.6:
                         alpha2 += \
                             (- 1)**(self.j + j1 + 1) \
                             * self.atom.getReducedMatrixElementJ(self.n,
@@ -2580,9 +2628,11 @@ class DynamicPolarizability:
         Can be combined for different states to allow finding magic wavelengths
         for pairs of states. Currently supports only driving with
         linearly polarised light. See example
+        `magic wavelength snippet`_.
 
-        Todo:
-            Add link to example calculation of magic wavelengths
+        .. _`magic wavelength snippet`:
+            ./ARC_3_0_introduction.html#Calculations-of-dynamic-polarisability-and-magic-wavelengths-for-optical-traps
+
 
         Args:
             wavelengthList (array): wavelengths for which we want to calculate
