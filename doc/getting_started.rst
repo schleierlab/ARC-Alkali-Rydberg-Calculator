@@ -1,19 +1,73 @@
-Getting started with ARC
-=========================
+Getting started
+===============
 
  .. _get-started-page:
 
-IPython notebook with examples
-------------------------------
+Example notebooks (.ipynb)
+--------------------------
 
-`Rydberg atoms - a primer`_ introduces Rydberg atoms and ARC package, and is a good **starting point** to learn how to use ARC to get relevant information about **alkali atoms** and **Rydberg states** in general. Notebook can also be downloaded in .ipython format :download:`here <./Rydberg_atoms_a_primer_notebook.ipynb>`, and can be interactively then modified and used in `Jupyter`_ .
+`Rydberg atoms - a primer`_ introduces Rydberg atoms and ARC package, and is a
+good **starting point** to learn how to use ARC to get relevant information about
+**alkali atoms** and **Rydberg states** in general.
 
-`An introduction to ARC 3.0: Alkali.ne Rydberg Calculator`_ introduces features added in ARC 3.0 version: support for **divalent atoms**, inter-species calculations, atom-surface interactions, dynamic polarizability calculations (AC Stark Shift), wave function plotting, and methods for work with optical lattices.
-Notebook can also be downloaded in .ipython format :download:`here <./ARC_3_0_introduction.ipynb>` and used interactively in `Jupyter`_ .
+.. toctree::
+    :maxdepth: 4
 
-.. _`Rydberg atoms - a primer`: ./_static/Rydberg_atoms_a_primer.html
+    Rydberg_atoms_a_primer_notebook
 
-.. _`An introduction to ARC 3.0: Alkali.ne Rydberg Calculator`: ./_static/ARC_3_0_introduction.html
+`An introduction to ARC 3.0: Alkali.ne Rydberg Calculator`_ introduces features
+added in ARC 3.0 version: support for **divalent atoms**, inter-species
+calculations, atom-surface interactions, dynamic polarizability calculations
+(AC Stark Shift), wave function plotting, and methods for work with optical
+lattices.
+
+.. toctree::
+    :maxdepth: 4
+
+    ARC_3_0_introduction
+
+`ARC 3.1 update: support for hyperfine structure for alkali atoms`_ expands
+support for **alkali metals**: hyperfine structure is added,
+and functions for dealing with Raman transitions and level structures in strong
+magnetic fields (Breit-Rabi diagrams).
+
+.. toctree::
+    :maxdepth: 4
+
+    ARC_3_1_additions
+
+`ARC 3.3 update: support for AC Stark shifts`_ adds support for single atom
+calculations that determine Stark maps of the Rydberg manifold due to an AC
+electric field.
+
+.. toctree::
+    :maxdepth: 4
+
+    AC_Stark_primer
+
+
+`ARC 3.8 update: support for angular channel analysis`_ adds support for s
+systematic search for suitable pair states relevant for Foster resonances and
+understanding structure of van der Waals interactions of Alkali Rydberg Atoms.
+
+.. toctree::
+    :maxdepth: 4
+
+    ARC_angularChannels.ipynb
+
+Click on the corresponding topic above to open static (HTML) version of the
+notebooks. If you want directly .ipynb format, open directly files form ARC
+repository and run them in `Jupyter`_ .
+
+.. _`Rydberg atoms - a primer`: ./Rydberg_atoms_a_primer_notebook.ipynb
+
+.. _`An introduction to ARC 3.0: Alkali.ne Rydberg Calculator`: ./ARC_3_0_introduction.ipynb
+
+.. _`ARC 3.1 update: support for hyperfine structure for alkali atoms`: ./ARC_3_1_additions.ipynb
+
+.. _`ARC 3.3 update: support for AC Stark shifts`: ./AC_Stark_primer.ipynb
+
+.. _`ARC 3.8 update: support for angular channel analysis`: ./ARC_angularChannels.ipynb
 
 .. _`Jupyter`: https://jupyter.org/
 

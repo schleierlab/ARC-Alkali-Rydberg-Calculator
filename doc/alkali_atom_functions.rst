@@ -1,75 +1,165 @@
 Alkali atom functions
 =====================
 
-Overview
---------
-
 .. currentmodule:: arc.alkali_atom_functions
 
-.. rubric:: Classes and global methods
+
+.. autoclass:: AlkaliAtom
+    :members: __init__
+    :exclude-members: __init__
+
+    .. autosummary::
+        :toctree: generated/
+
+
+Elementary properties
+---------------------
+
+.. rubric:: Methods
 
 .. autosummary::
+    :toctree: generated/
 
-    AlkaliAtom
-    NumerovBack
-    saveCalculation
-    loadSavedCalculation
-    printState
-    printStateString
-    printStateStringLatex
+    ~AlkaliAtom.getPressure
+    ~AlkaliAtom.getNumberDensity
+    ~AlkaliAtom.getAverageInteratomicSpacing
+    ~AlkaliAtom.getAverageSpeed
 
-.. rubric:: AlkaliAtom Methods
+.. rubric:: Attributes
 
 .. autosummary::
+    :toctree: generated/
 
-    AlkaliAtom.getDipoleMatrixElement
-    AlkaliAtom.getDipoleMatrixElementHFS
-    AlkaliAtom.getTransitionWavelength
-    AlkaliAtom.getTransitionFrequency
-    AlkaliAtom.getRabiFrequency
-    AlkaliAtom.getRabiFrequency2
-    AlkaliAtom.getStateLifetime
-    AlkaliAtom.getTransitionRate
-    AlkaliAtom.getReducedMatrixElementJ_asymmetric
-    AlkaliAtom.getReducedMatrixElementJ
-    AlkaliAtom.getReducedMatrixElementL
-    AlkaliAtom.getRadialMatrixElement
-    AlkaliAtom.getQuadrupoleMatrixElement
-    AlkaliAtom.getPressure
-    AlkaliAtom.getNumberDensity
-    AlkaliAtom.getAverageInteratomicSpacing
-    AlkaliAtom.corePotential
-    AlkaliAtom.effectiveCharge
-    AlkaliAtom.potential
-    AlkaliAtom.radialWavefunction
-    AlkaliAtom.getEnergy
-    AlkaliAtom.getZeemanEnergyShift
-    AlkaliAtom.getQuantumDefect
-    AlkaliAtom.getC6term
-    AlkaliAtom.getC3term
-    AlkaliAtom.getEnergyDefect
-    AlkaliAtom.getEnergyDefect2
-    AlkaliAtom.updateDipoleMatrixElementsFile
-    AlkaliAtom.getRadialCoupling
-    AlkaliAtom.getAverageSpeed
-    AlkaliAtom.getLiteratureDME
+    ~AlkaliAtom.I
+    ~AlkaliAtom.Z
+    ~AlkaliAtom.abundance
+    ~AlkaliAtom.elementName
+    ~AlkaliAtom.groundStateN
+    ~AlkaliAtom.extraLevels
+    
+    ~AlkaliAtom.mass
+    ~AlkaliAtom.meltingPoint
+    
 
-.. rubric:: Angular algebra in `arc.wigner`
+Internal structure of atom states
+---------------------------------
 
-.. currentmodule:: arc.wigner
+.. rubric:: Methods
 
 .. autosummary::
-    CG
-    Wigner3j
-    Wigner6j
-    WignerDmatrix
+    :toctree: generated/
 
-Detailed documentation
-----------------------
+    ~AlkaliAtom.corePotential
+    ~AlkaliAtom.effectiveCharge
+    ~AlkaliAtom.potential
+    ~AlkaliAtom.radialWavefunction
 
-.. automodule:: arc.alkali_atom_functions
-   :members:
+.. rubric:: Attributes
+
+.. autosummary::
+    :toctree: generated/
+
+    ~AlkaliAtom.a1
+    ~AlkaliAtom.a2
+    ~AlkaliAtom.a3
+    ~AlkaliAtom.a4
+    ~AlkaliAtom.rc
+    ~AlkaliAtom.alphaC
+    ~AlkaliAtom.alpha_d_eff
+    ~AlkaliAtom.alpha_q_eff
+    ~AlkaliAtom.cpp_numerov
 
 
-.. automodule:: arc.wigner
-    :members:
+Energies of atom states
+-----------------------
+
+.. rubric:: Methods
+
+.. autosummary::
+    :toctree: generated/
+
+    ~AlkaliAtom.getEnergy
+    ~AlkaliAtom.getZeemanEnergyShift
+    ~AlkaliAtom.getQuantumDefect
+    ~AlkaliAtom.breitRabi
+
+.. rubric:: Attributes
+
+.. autosummary::
+    :toctree: generated/
+
+    ~AlkaliAtom.gI
+    ~AlkaliAtom.gL       
+    ~AlkaliAtom.hyperfineStructureData 
+
+    ~AlkaliAtom.levelDataFromNIST
+    ~AlkaliAtom.sEnergy
+    ~AlkaliAtom.quantumDefect
+    ~AlkaliAtom.minQuantumDefectN
+
+
+Transitions between states
+--------------------------
+
+
+.. rubric:: Methods
+
+.. autosummary::
+    :toctree: generated/
+
+    ~AlkaliAtom.getDipoleMatrixElement
+    ~AlkaliAtom.getDipoleMatrixElementHFS
+    ~AlkaliAtom.getTransitionWavelength
+    ~AlkaliAtom.getTransitionFrequency
+    ~AlkaliAtom.getRabiFrequency
+    ~AlkaliAtom.getRabiFrequency2
+    ~AlkaliAtom.getDrivingPower
+    ~AlkaliAtom.getStateLifetime
+    ~AlkaliAtom.getTransitionRate
+    ~AlkaliAtom.getReducedMatrixElementJ_asymmetric
+    ~AlkaliAtom.getReducedMatrixElementJ
+    ~AlkaliAtom.getReducedMatrixElementL
+    ~AlkaliAtom.getRadialMatrixElement
+    ~AlkaliAtom.getSphericalDipoleMatrixElement
+    ~AlkaliAtom.getQuadrupoleMatrixElement
+
+    ~AlkaliAtom.getC6term
+    ~AlkaliAtom.getC3term
+    ~AlkaliAtom.getEnergyDefect
+    ~AlkaliAtom.getEnergyDefect2
+    ~AlkaliAtom.updateDipoleMatrixElementsFile
+    ~AlkaliAtom.getRadialCoupling
+    ~AlkaliAtom.getLiteratureDME
+
+    ~AlkaliAtom.getSphericalMatrixElementHFStoFS
+    ~AlkaliAtom.getDipoleMatrixElementHFStoFS
+    ~AlkaliAtom.getMagneticDipoleMatrixElementHFS
+    ~AlkaliAtom.getHFSCoefficients
+    ~AlkaliAtom.getHFSEnergyShift
+    ~AlkaliAtom.getBranchingRatio
+    ~AlkaliAtom.getBranchingRatioFStoFS
+    ~AlkaliAtom.getBranchingRatioFStoHFS
+    ~AlkaliAtom.getBranchingRatioHFStoFS
+    ~AlkaliAtom.getSaturationIntensity
+    ~AlkaliAtom.getSaturationIntensityIsotropic
+    ~AlkaliAtom.groundStateRamanTransition
+    ~AlkaliAtom.twoPhotonRydbergExcitation
+    ~AlkaliAtom.getLandegj
+    ~AlkaliAtom.getLandegjExact
+    ~AlkaliAtom.getLandegf
+    ~AlkaliAtom.getLandegfExact
+    ~AlkaliAtom.breitRabi
+
+.. rubric:: Attributes
+
+.. autosummary::
+    :toctree: generated/
+
+    ~AlkaliAtom.literatureDMEfilename
+    ~AlkaliAtom.dipoleMatrixElementFile
+    ~AlkaliAtom.quadrupoleMatrixElementFile
+        
+
+        
+        
+
