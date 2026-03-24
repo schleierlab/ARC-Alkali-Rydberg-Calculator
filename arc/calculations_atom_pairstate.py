@@ -545,16 +545,15 @@ class PairStateInteractions:
             np.save(fileHandle, data)
             fileHandle.close()
         except IOError:
-<<<<<<< HEAD
             print("Error while updating angularMatrix \
                 data meta (description) File " + self.angularMatrixFile_meta)
-=======
+
             print(
                 "Error while updating angularMatrix \
                 data meta (description) File "
                 + self.angularMatrixFile_meta
             )
->>>>>>> repo2/master
+
 
         try:
             fileHandle = gzip.GzipFile(
