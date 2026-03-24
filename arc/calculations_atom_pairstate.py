@@ -21,7 +21,7 @@ Example:
         calc1.defineBasis( 0., 0., 4, 5,10e9)
         # optionally we can save now results of calculation for future use
         saveCalculation(calc1,"mycalculation.pkl")
-        calculation1.diagonalise(linspace(1,10.0,30),250,progressOutput = True,drivingFromState=[6,1,0.5,0.5,0])
+        calc1.diagonalise(linspace(1,10.0,30),250,progressOutput = True,drivingFromState=[6,1,0.5,0.5,0])
         calc1.plotLevelDiagram()
         calc1.ax.set_xlim(1,10)
         calc1.ax.set_ylim(-2,2)
@@ -43,7 +43,6 @@ import gzip
 import os
 import sqlite3
 import sys
-import os
 import datetime
 import matplotlib
 from matplotlib.colors import LinearSegmentedColormap
@@ -545,16 +544,8 @@ class PairStateInteractions:
             np.save(fileHandle, data)
             fileHandle.close()
         except IOError:
-<<<<<<< HEAD
             print("Error while updating angularMatrix \
                 data meta (description) File " + self.angularMatrixFile_meta)
-=======
-            print(
-                "Error while updating angularMatrix \
-                data meta (description) File "
-                + self.angularMatrixFile_meta
-            )
->>>>>>> repo2/master
 
         try:
             fileHandle = gzip.GzipFile(
@@ -913,15 +904,6 @@ class PairStateInteractions:
             )
 
         for i in xrange(dimension):
-<<<<<<< HEAD
-
-            ed = self.__getEnergyDefect(
-                states[opi][0], states[opi][1], states[opi][2],
-                states[opi][3], states[opi][4], states[opi][5],
-                states[i][0], states[i][1], states[i][2],
-                states[i][3], states[i][4], states[i][5]) / C_h * 1.0e-9\
-                - opZeemanShift # - starkShift
-=======
             ed = (
                 self.__getEnergyDefect(
                     states[opi][0],
@@ -941,7 +923,6 @@ class PairStateInteractions:
                 * 1.0e-9
                 - opZeemanShift
             )
->>>>>>> repo2/master
 
             pairState1 = (
                 "|"
@@ -1460,62 +1441,6 @@ class PairStateInteractions:
             )
         return np.real(value), vectors
 
-<<<<<<< HEAD
-    def defineBasis(self,theta,phi,nRange,lrange,energyDelta,\
-                             Bz=0, progressOutput=False,debugOutput=False,Ez = 0, forceNolimitMj = False):
-        r"""
-            Finds relevant states in the vicinity of the given pair-state
-
-            Finds relevant pair-state basis and calculates interaction matrix.
-            Pair-state basis is saved in :obj:`basisStates`.
-            Interaction matrix is saved in parts depending on the scaling with
-            distance. Diagonal elements :obj:`matDiagonal`, correponding to
-            relative energy defects of the pair-states, don't change with
-            interatomic separation. Off diagonal elements can depend
-            on distance as :math:`R^{-3}, R^{-4}` or :math:`R^{-5}`,
-            corresponding to dipole-dipole (:math:`C_3` ), dipole-qudrupole
-            (:math:`C_4` ) and quadrupole-quadrupole coupling (:math:`C_5` )
-            respectively. These parts of the matrix are stored in :obj:`matR`
-            in that order. I.e. :obj:`matR[0]` stores dipole-dipole coupling
-            (:math:`\propto R^{-3}`), :obj:`matR[0]` stores dipole-quadrupole
-            couplings etc.
-
-            Args:
-                theta (float):  relative orientation of the two atoms
-                    (see figure on top of the page), range 0 to :math:`\pi`
-                phi (float): relative orientation of the two atoms (see figure
-                    on top of the page), range 0 to :math:`2\pi`
-                nRange (int): how much below and above the given principal
-                    quantum number of the pair state we should be looking?
-                lrange (int): what is the maximum angular orbital momentum
-                    state that we are including in calculation
-                energyDelta (float): what is maximum energy difference (
-                    :math:`\Delta E/h` in Hz)
-                    between the original pair state and the other pair states
-                    that we are including in calculation
-                Bz (float): optional, magnetic field directed along z-axis in
-                    units of Tesla. Calculation will be correct only for weak
-                    magnetic fields, where paramagnetic term is much stronger
-                    then diamagnetic term. Diamagnetic term is neglected.
-                progressOutput (bool): optional, False by default. If true, prints
-                    information about the progress of the calculation.
-                debugOutput (bool): optional, False by default. If true, similar
-                    to progressOutput=True, this will print information about the
-                    progress of calculations, but with more verbose output.
-
-            Args we added (NOTE: the electric field hasn't been fully implemented or tested yet):
-                Ez: electric field along z-axis (can be later changed to be in any direction).
-                    For now we'll set this up so it doesn't affect the basis, only the interaction matrices.
-                forceNolimitMj: can use to force the program not to limit the basis to only accessible mj states.
-                    This will make the calculation substantially slower, but can be used when we want the entire
-                    interaction matrix independent of the states picked for the pair state.
-
-            See also:
-                :obj:`alkali_atom_functions.saveCalculation` and
-                :obj:`alkali_atom_functions.loadSavedCalculation` for
-                information on saving intermediate results of calculation for
-                later use.
-=======
     def _getd(self, l, j, ll, jj, l1, j1, l2, j2):
         r"""
         Gets the mj-resolved matrix for the transition weights.
@@ -3004,6 +2929,7 @@ class PairStateInteractions:
         Bz=0,
         progressOutput=False,
         debugOutput=False,
+        forceNolimitMj=False
     ):
         r"""
         Finds relevant states in the vicinity of the given pair-state
@@ -3054,7 +2980,6 @@ class PairStateInteractions:
             :obj:`arc.alkali_atom_functions.loadSavedCalculation` for
             information on saving intermediate results of calculation for
             later use.
->>>>>>> repo2/master
         """
 
         self.__initializeDatabaseForMemoization()
@@ -3062,7 +2987,7 @@ class PairStateInteractions:
         #save call parameters
         self.theta = theta; self.phi = phi; self.nRange = nRange;
         self.lrange = lrange; self.energyDelta = energyDelta
-        self.Bz = Bz; self.Ez = Ez;
+        self.Bz = Bz; 
 
         self.basisStates = []
 
@@ -3070,11 +2995,7 @@ class PairStateInteractions:
         wgd = WignerDmatrix(theta, phi)
 
         limitBasisToMj = False
-<<<<<<< HEAD
         if (theta<0.001 and not forceNolimitMj):
-=======
-        if theta < 0.001:
->>>>>>> repo2/master
             limitBasisToMj = True  # Mj will be conserved in calculations
 
         originalMj = self.m1 + self.m2
@@ -3195,11 +3116,6 @@ class PairStateInteractions:
                 dMatrix1 = wgd.get(self.basisStates[i][2])
                 dMatrix2 = wgd.get(self.basisStates[i][6])
 
-<<<<<<< HEAD
-                for i in xrange(self.index[ii],self.index[ii+1]):
-                    statePart1 = singleAtomState(self.basisStates[i][2], self.basisStates[i][3])
-                    statePart2 = singleAtomState(self.basisStates[i][6], self.basisStates[i][7])
-=======
                 for i in xrange(self.index[ii], self.index[ii + 1]):
                     statePart1 = singleAtomState(
                         self.basisStates[i][2], self.basisStates[i][3]
@@ -3207,7 +3123,6 @@ class PairStateInteractions:
                     statePart2 = singleAtomState(
                         self.basisStates[i][6], self.basisStates[i][7]
                     )
->>>>>>> repo2/master
                     # rotate individual states
 
                     statePart1 = dMatrix1.T.conjugate().dot(statePart1)
@@ -3215,48 +3130,6 @@ class PairStateInteractions:
 
                     stateCom = compositeState(statePart1, statePart2)
 
-<<<<<<< HEAD
-                    if (matRIndex==0):
-                        zeemanShift = (self.atom1.getZeemanEnergyShift(
-                                           self.basisStates[i][1],
-                                           self.basisStates[i][2],
-                                           self.basisStates[i][3],
-                                           self.Bz,
-                                           s=self.s1) + \
-                                       self.atom2.getZeemanEnergyShift(
-                                           self.basisStates[i][5],
-                                           self.basisStates[i][6],
-                                           self.basisStates[i][7],
-                                           self.Bz,
-                                           self.s2)) / C_h * 1.0e-9   # in GHz
-
-#                        ## testing out adding in an eletric field dependence (in the z direction)
-#                        ## first calculating the polarizability from second order perturbation theory - not sure if this works correctly
-#                        ## maybe I could replace this and do it in the for loops above???
-#                        def getPolFromSecondOrderPertTheory(n0,l0,j0,mj0,q=0):
-#                            nRange = np.concatenate((np.arange(n0-self.nrange,n0,1),np.arange(n0+1,n0+self.nrange,1)))
-#                            pertTheorySum = 0
-#                            for n1 in nRange:
-#                                for l1 in [l0-1,l0,l0+1]:
-#                                    for j1 in [l1-0.5,l1+0.5]:
-#                                        if((j1 != 0 or j0 != 0) and j1 >=0 and np.abs(mj0+q) <= j1):
-#                                            dipMatElem = self.atom.getDipoleMatrixElement(n0,l0,j0,mj0,n1,l1,j1,mj0+q,q)
-#                                            dipMatElemSI = dipMatElem*C_e*physical_constants["Bohr radius"][0]
-#                                            energyDifference = (self.atom.getEnergy(n0,l0,j0)- self.atom.getEnergy(n1,l1,j1))*C_e
-#                                            pertTheorySum += (dipMatElemSI)**2/energyDifference
-#                            return(2*pertTheorySum/(10**2*(C_h/2*np.pi)))
-#
-#                        ## then using that to calculate energy shift
-#                        starkShift = -0.5*(getPolFromSecondOrderPertTheory(self.basisStates[i][0],self.basisStates[i][1],
-#                                           self.basisStates[i][2],self.basisStates[i][3]) +\
-#                                           getPolFromSecondOrderPertTheory(self.basisStates[i][4],self.basisStates[i][5],
-#                                           self.basisStates[i][6],self.basisStates[i][7]))*self.Ez**2
-
-
-                        matDiagonalConstructor[0].append(ed + zeemanShift + # starkShift +
-                                                         degeneracyOffset)
-                        degeneracyOffset +=  0.00000001
-=======
                     if matRIndex == 0:
                         zeemanShift = (
                             (
@@ -3282,7 +3155,6 @@ class PairStateInteractions:
                             ed + zeemanShift + degeneracyOffset
                         )
                         degeneracyOffset += 0.00000001
->>>>>>> repo2/master
                         matDiagonalConstructor[1].append(i)
                         matDiagonalConstructor[2].append(i)
 
@@ -3309,11 +3181,6 @@ class PairStateInteractions:
                         else:
                             print(" - - - ", self.channel[jj])
 
-<<<<<<< HEAD
-                        for j in xrange(self.index[jj],self.index[jj+1]):
-                            statePart1 = singleAtomState(self.basisStates[j][2], self.basisStates[j][3])
-                            statePart2 = singleAtomState(self.basisStates[j][6], self.basisStates[j][7])
-=======
                         for j in xrange(self.index[jj], self.index[jj + 1]):
                             statePart1 = singleAtomState(
                                 self.basisStates[j][2], self.basisStates[j][3]
@@ -3321,7 +3188,6 @@ class PairStateInteractions:
                             statePart2 = singleAtomState(
                                 self.basisStates[j][6], self.basisStates[j][7]
                             )
->>>>>>> repo2/master
                             # rotate individual states
 
                             statePart1 = dMatrix3.T.conjugate().dot(statePart1)
@@ -3377,64 +3243,6 @@ class PairStateInteractions:
         self.__updateAngularMatrixElementsFile()
         self.__closeDatabaseForMemoization()
 
-<<<<<<< HEAD
-
-    def diagonalize(self,rangeR,noOfEigenvectors,
-                         drivingFromState = [0,0,0,0,0],
-                         eigenstateDetuning = 0.,
-                         sortEigenvectors = False,
-                         progressOutput = False,
-                         debugOutput = False):
-        """
-            Finds eigenstates in atom pair basis.
-
-            ARPACK ( :obj:`scipy.sparse.linalg.eigsh`) calculation of the
-            `noOfEigenvectors` eigenvectors closest to the original state. If
-            `drivingFromState` is specified as `[n,l,j,mj,q]` coupling between
-            the pair-states and the situation where one of the atoms in the
-            pair state basis is in :math:`|n,l,j,m_j\rangle` state due to
-            driving with a laser field that drives :math:`q` transition
-            (+1,0,-1 for :math:`\sigma^-`, :math:`\pi` and :math:`\sigma^+`
-            transitions respectively) is calculated and marked by the
-            colourmaping these values on the obtained eigenvectors.
-
-            Args:
-                rangeR ( :obj:`array`): Array of values for distance between
-                    the atoms (in :math:`\mu` m) for which we want to calculate
-                    eigenstates.
-                noOfEigenvectors (int): number of eigen vectors closest to the
-                    energy of the original (unperturbed) pair state. Has to be
-                    smaller then the total number of states.
-                eigenstateDetuning (float, optional): Default is 0. This
-                    specifies detuning from the initial pair-state (in Hz)
-                    around which we want to find `noOfEigenvectors`
-                    eigenvectors. This is useful when looking only for couple
-                    of off-resonant features.
-                drivingFromState ([int,int,float,float,int]): Optional. State
-                    of one of the atoms from the original pair-state basis
-                    from which we try to drive to the excited pair-basis
-                    manifold, **assuming that the first of the two atoms is
-                    already excited to the specified Rydberg state**.
-                    By default, program will calculate just
-                    contribution of the original pair-state in the eigenstates
-                    obtained by diagonalization, and will highlight it's
-                    admixure by colour mapping the obtained eigenstates plot.
-                    State is specified as :math:`[n,\ell,j,mj, d]`
-                    where :math:`d` is +1, 0 or
-                    -1 for driving :math:`\sigma^-` , :math:`\pi`
-                    and :math:`\sigma^+` transitions respectively.
-                sortEigenvectors(bool): optional, False by default. Tries to
-                    sort eigenvectors so that given eigen vector index
-                    corresponds to adiabatically changing eigenstate, as
-                    detirmined by maximising overlap between old and new
-                    eigenvectors.
-                progressOutput (bool): optional, False by default. If true,
-                    prints information about the progress of the calculation.
-                debugOutput (bool): optional, False by default. If true,
-                    similarly to progressOutput=True, this will print
-                    information about the progress of calculations, but with
-                    more verbose output.
-=======
     def diagonalise(
         self,
         rangeR,
@@ -3494,7 +3302,6 @@ class PairStateInteractions:
                 similarly to progressOutput=True, this will print
                 information about the progress of calculations, but with
                 more verbose output.
->>>>>>> repo2/master
         """
 
         self.r = np.sort(rangeR)[::-1]
@@ -3509,14 +3316,7 @@ class PairStateInteractions:
         # what are the dominant contributing states?
         self.composition = []
 
-<<<<<<< HEAD
-        # this should return the composition but as eigenvectors (with respect to basis states) instead of strings
-        self.eigVecs = []
-
-        if (noOfEigenvectors >= dimension - 1):
-=======
         if noOfEigenvectors >= dimension - 1:
->>>>>>> repo2/master
             noOfEigenvectors = dimension - 1
             print(
                 "Warning: Requested number of eigenvectors >=dimension-1\n \
@@ -3700,16 +3500,10 @@ class PairStateInteractions:
                 comp = []
                 eigs = []
                 for i in xrange(len(ev)):
-<<<<<<< HEAD
-                    sh.append(abs(egvector[self.originalPairStateIndex,i])**2)
-                    comp.append(self._stateComposition(egvector[:,i]))
-                    eigs.append(egvector[:,i])
-=======
                     sh.append(
                         abs(egvector[self.originalPairStateIndex, i]) ** 2
                     )
                     comp.append(self._stateComposition(egvector[:, i]))
->>>>>>> repo2/master
                 self.highlight.append(sh)
                 self.composition.append(comp)
                 self.eigVecs.append(eigs)
@@ -3967,16 +3761,9 @@ class PairStateInteractions:
             )
         return stateString
 
-<<<<<<< HEAD
-    def plotLevelDiagram(self,  highlightColor='red',
-                         highlightScale='linear',
-                         units='GHz',
-                         vmax=1.):
-=======
     def plotLevelDiagram(
         self, highlightColor="red", highlightScale="linear", units="GHz"
     ):
->>>>>>> repo2/master
         """
         Plots pair state level diagram
 
@@ -4015,21 +3802,12 @@ class PairStateInteractions:
             self.scaleFactor = 1e9 / (C_c * 100)
             eLabel = "/(h c)"
 
-<<<<<<< HEAD
-        if highlightScale == 'linear':
-            cNorm = matplotlib.colors.Normalize(vmin=0., vmax=vmax)
-        elif highlightScale == 'log-2':
-            cNorm = matplotlib.colors.LogNorm(vmin=1e-2, vmax=vmax)
-        elif highlightScale == 'log-3':
-            cNorm = matplotlib.colors.LogNorm(vmin=1e-3, vmax=vmax)
-=======
         if highlightScale == "linear":
             cNorm = matplotlib.colors.Normalize(vmin=0.0, vmax=1.0)
         elif highlightScale == "log-2":
             cNorm = matplotlib.colors.LogNorm(vmin=1e-2, vmax=1)
         elif highlightScale == "log-3":
             cNorm = matplotlib.colors.LogNorm(vmin=1e-3, vmax=1)
->>>>>>> repo2/master
         else:
             raise ValueError(
                 "Only 'linear', 'log-2' and 'log-3' are valid "
@@ -4207,46 +3985,6 @@ class PairStateInteractions:
         self, rStart, rStop, showPlot=False, minStateContribution=0.0
     ):
         """
-<<<<<<< HEAD
-            Finds :math:`C_6` coefficient for original pair state.
-
-            Function first finds for each distance in the range
-            [ `rStart` , `rStop` ] the eigen state with highest contribution of
-            the original state. One can set optional parameter
-            `minStateContribution` to value in the range [0,1), so that function
-            finds only states if they have contribution of the original state
-            that is bigger then `minStateContribution`.
-
-            Once original pair-state is found in the range of interatomic
-            distances, from smallest `rStart` to the biggest `rStop`, function
-            will try to perform fitting of the corresponding state energy
-            :math:`E(R)` at distance :math:`R` to the function
-            :math:`A+C_6/R^6` where :math:`A` is some offset.
-
-            Args:
-                rStart (float): smallest inter-atomic distance to be used for fitting
-                rStop (float): maximum inter-atomic distance to be used for fitting
-                showPlot (bool): If set to true, it will print the plot showing
-                    fitted energy level and the obtained best fit. Default is
-                    False
-                minStateContribution (float): valid values are in the range [0,1).
-                    It specifies minimum amount of the original state in the given
-                    energy state necessary for the state to be considered for
-                    the adiabatic continuation of the original unperturbed
-                    pair state.
-
-            Returns:
-                float:
-                    :math:`C_6` measured in :math:`\\text{GHz }\\mu\\text{m}^6`
-                    on success; If unsuccessful returns False.
-
-            Note:
-                In order to use this functions, highlighting in
-                :obj:`diagonalize` should be based on the original pair
-                state contribution of the eigenvectors (that this,
-                `drivingFromState` parameter should not be set, which
-                corresponds to `drivingFromState` = [0,0,0,0,0]).
-=======
         Finds :math:`C_6` coefficient for original pair state.
 
         Function first finds for each distance in the range
@@ -4285,7 +4023,6 @@ class PairStateInteractions:
             state contribution of the eigenvectors (that this,
             `drivingFromState` parameter should not be set, which
             corresponds to `drivingFromState` = [0,0,0,0,0]).
->>>>>>> repo2/master
         """
         initialStateDetuning = []
         initialStateDetuningX = []
@@ -4389,51 +4126,6 @@ class PairStateInteractions:
         resonantBranch=+1,
     ):
         """
-<<<<<<< HEAD
-            Finds :math:`C_3` coefficient for original pair state.
-
-            Function first finds for each distance in the range
-            [`rStart` , `rStop`] the eigen state with highest contribution of
-            the original state. One can set optional parameter
-            `minStateContribution` to value in the range [0,1), so that function
-            finds only states if they have contribution of the original state
-            that is bigger then `minStateContribution`.
-
-            Once original pair-state is found in the range of interatomic
-            distances, from smallest `rStart` to the biggest `rStop`, function
-            will try to perform fitting of the corresponding state energy
-            :math:`E(R)` at distance :math:`R` to the function
-            :math:`A+C_3/R^3` where :math:`A` is some offset.
-
-            Args:
-                rStart (float): smallest inter-atomic distance to be used for fitting
-                rStop (float): maximum inter-atomic distance to be used for fitting
-                showPlot (bool): If set to true, it will print the plot showing
-                    fitted energy level and the obtained best fit. Default is
-                    False
-                minStateContribution (float): valid values are in the range [0,1).
-                    It specifies minimum amount of the original state in the given
-                    energy state necessary for the state to be considered for
-                    the adiabatic continuation of the original unperturbed
-                    pair state.
-                resonantBranch (int): optional, default +1. For resonant
-                    interactions we have two branches with identical
-                    state contributions. In this case, we will select only
-                    positively detuned branch (for resonantBranch = +1)
-                    or negatively detuned branch (fore resonantBranch = -1)
-                    depending on the value of resonantBranch optional parameter
-            Returns:
-                float:
-                    :math:`C_3` measured in :math:`\\text{GHz }\\mu\\text{m}^6`
-                    on success; If unsuccessful returns False.
-
-            Note:
-                In order to use this functions, highlighting in
-                :obj:`diagonalize` should be based on the original pair
-                state contribution of the eigenvectors (that this,
-                `drivingFromState` parameter should not be set, which
-                corresponds to `drivingFromState` = [0,0,0,0,0]).
-=======
         Finds :math:`C_3` coefficient for original pair state.
 
         Function first finds for each distance in the range
@@ -4477,7 +4169,6 @@ class PairStateInteractions:
             state contribution of the eigenvectors (that this,
             `drivingFromState` parameter should not be set, which
             corresponds to `drivingFromState` = [0,0,0,0,0]).
->>>>>>> repo2/master
         """
 
         selectBranch = False
@@ -4609,46 +4300,6 @@ class PairStateInteractions:
         self, rStart, rStop, showPlot=False, minStateContribution=0.0
     ):
         """
-<<<<<<< HEAD
-            Finds :math:`r_{\\rm vdW}` coefficient for original pair state.
-
-            Function first finds for each distance in the range [`rStart`,`rStop`]
-            the eigen state with highest contribution of the original state.
-            One can set optional parameter `minStateContribution` to value in
-            the range [0,1), so that function finds only states if they have
-            contribution of the original state that is bigger then
-            `minStateContribution`.
-
-            Once original pair-state is found in the range of interatomic
-            distances, from smallest `rStart` to the biggest `rStop`, function
-            will try to perform fitting of the corresponding state energy
-            :math:`E(R)` at distance :math:`R` to the function
-            :math:`A+B\\frac{1-\\sqrt{1+(r_{\\rm vdW}/r)^6}}{1-\\sqrt{1+r_{\\rm vdW}^6}}`
-             where :math:`A` and :math:`B` are some offset.
-
-            Args:
-                rStart (float): smallest inter-atomic distance to be used for fitting
-                rStop (float): maximum inter-atomic distance to be used for fitting
-                showPlot (bool): If set to true, it will print the plot showing
-                    fitted energy level and the obtained best fit. Default is
-                    False
-                minStateContribution (float): valid values are in the range [0,1).
-                    It specifies minimum amount of the original state in the given
-                    energy state necessary for the state to be considered for
-                    the adiabatic continuation of the original unperturbed
-                    pair state.
-            Returns:
-                float:
-                    :math:`r_{\\rm vdW}`  measured in :math:`\\mu\\text{m}`
-                    on success; If unsuccessful returns False.
-
-            Note:
-                In order to use this functions, highlighting in
-                :obj:`diagonalize` should be based on the original pair
-                state contribution of the eigenvectors (that this,
-                `drivingFromState` parameter should not be set, which
-                corresponds to `drivingFromState` = [0,0,0,0,0]).
-=======
         Finds :math:`r_{\\rm vdW}` coefficient for original pair state.
 
         Function first finds for each distance in the range [`rStart`,`rStop`]
@@ -4686,7 +4337,6 @@ class PairStateInteractions:
             state contribution of the eigenvectors (that this,
             `drivingFromState` parameter should not be set, which
             corresponds to `drivingFromState` = [0,0,0,0,0]).
->>>>>>> repo2/master
         """
 
         initialStateDetuning = []
@@ -4992,14 +4642,6 @@ class StarkMapResonances:
         # find where is the original pair state
 
         sm1 = StarkMap(self.atom1)
-<<<<<<< HEAD
-        sm1.defineBasis(self.state1[0], self.state1[1], self.state1[2],
-                        self.state1[3], nMin, nMax, maxL, Bz=self.Bz,
-                        progressOutput=progressOutput,
-                        s=self.state1[4])
-        sm1.diagonalize(eFieldList,  progressOutput=progressOutput)
-        if ((self.atom2 is self.atom1)
-=======
         sm1.defineBasis(
             self.state1[0],
             self.state1[1],
@@ -5015,7 +4657,6 @@ class StarkMapResonances:
         sm1.diagonalise(eFieldList, progressOutput=progressOutput)
         if (
             (self.atom2 is self.atom1)
->>>>>>> repo2/master
             and (self.state1[0] == self.state2[0])
             and (self.state1[1] == self.state2[1])
             and (abs(self.state1[2] - self.state2[2]) < 0.1)
@@ -5025,13 +4666,6 @@ class StarkMapResonances:
             sm2 = sm1
         else:
             sm2 = StarkMap(self.atom2)
-<<<<<<< HEAD
-            sm2.defineBasis(self.state2[0], self.state2[1], self.state2[2],
-                            self.state2[3], nMin, nMax, maxL, Bz=self.Bz,
-                            progressOutput=progressOutput,
-                            s=self.state2[4])
-            sm2.diagonalize(eFieldList,  progressOutput=progressOutput)
-=======
             sm2.defineBasis(
                 self.state2[0],
                 self.state2[1],
@@ -5045,7 +4679,6 @@ class StarkMapResonances:
                 s=self.state2[4],
             )
             sm2.diagonalise(eFieldList, progressOutput=progressOutput)
->>>>>>> repo2/master
 
         self.originalStateY = []
         self.originalStateContribution = []
@@ -5094,20 +4727,6 @@ class StarkMapResonances:
         self.composition = []
 
         for dm1 in dmlist1:
-<<<<<<< HEAD
-            sm1.defineBasis(n1, l1, j1, mj1 + dm1, nMin, nMax, maxL,
-                            Bz=self.Bz,
-                            progressOutput=progressOutput,
-                            s=self.state1[4])
-            sm1.diagonalize(eFieldList, progressOutput=progressOutput)
-
-            for dm2 in dmlist2:
-                sm2.defineBasis(n2, l2, j2, mj2 + dm2, nMin, nMax, maxL,
-                                Bz=self.Bz,
-                                progressOutput=progressOutput,
-                                s=self.state2[4])
-                sm2.diagonalize(eFieldList,  progressOutput=progressOutput)
-=======
             sm1.defineBasis(
                 n1,
                 l1,
@@ -5136,7 +4755,6 @@ class StarkMapResonances:
                     s=self.state2[4],
                 )
                 sm2.diagonalise(eFieldList, progressOutput=progressOutput)
->>>>>>> repo2/master
 
                 for i in xrange(len(sm1.eFieldList)):
                     yList = []
