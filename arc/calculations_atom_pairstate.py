@@ -41,7 +41,6 @@ from arc.alkali_atom_functions import (
 from scipy.constants import physical_constants, pi
 import gzip
 import os
-import sqlite3
 import sys
 import datetime
 import matplotlib
@@ -2985,9 +2984,12 @@ class PairStateInteractions:
         self.__initializeDatabaseForMemoization()
 
         #save call parameters
-        self.theta = theta; self.phi = phi; self.nRange = nRange;
-        self.lrange = lrange; self.energyDelta = energyDelta
-        self.Bz = Bz; 
+        self.theta = theta
+        self.phi = phi
+        self.nRange = nRange
+        self.lrange = lrange
+        self.energyDelta = energyDelta
+        self.Bz = Bz
 
         self.basisStates = []
 
