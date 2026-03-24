@@ -545,15 +545,16 @@ class PairStateInteractions:
             np.save(fileHandle, data)
             fileHandle.close()
         except IOError:
+<<<<<<< HEAD
             print("Error while updating angularMatrix \
                 data meta (description) File " + self.angularMatrixFile_meta)
-
+=======
             print(
                 "Error while updating angularMatrix \
                 data meta (description) File "
                 + self.angularMatrixFile_meta
             )
-
+>>>>>>> repo2/master
 
         try:
             fileHandle = gzip.GzipFile(
@@ -912,13 +913,15 @@ class PairStateInteractions:
             )
 
         for i in xrange(dimension):
+<<<<<<< HEAD
+
             ed = self.__getEnergyDefect(
                 states[opi][0], states[opi][1], states[opi][2],
                 states[opi][3], states[opi][4], states[opi][5],
                 states[i][0], states[i][1], states[i][2],
                 states[i][3], states[i][4], states[i][5]) / C_h * 1.0e-9\
                 - opZeemanShift # - starkShift
-
+=======
             ed = (
                 self.__getEnergyDefect(
                     states[opi][0],
@@ -938,7 +941,7 @@ class PairStateInteractions:
                 * 1.0e-9
                 - opZeemanShift
             )
-
+>>>>>>> repo2/master
 
             pairState1 = (
                 "|"
