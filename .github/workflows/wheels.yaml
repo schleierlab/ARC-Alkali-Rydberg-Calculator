@@ -79,7 +79,7 @@ jobs:
           uv venv
           uv sync
       - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@0.32.0
+        uses: aquasecurity/trivy-action@v0.32.0
         with:
           scan-type: 'fs'
           ignore-unfixed: true
@@ -93,7 +93,7 @@ jobs:
           sarif_file: 'trivy-results.sarif'
 
       - name: Fail build on High/Criticial Vulnerabilities
-        uses: aquasecurity/trivy-action@0.32.0
+        uses: aquasecurity/trivy-action@v0.32.0
         with:
           scan-type: "fs"
           format: table
