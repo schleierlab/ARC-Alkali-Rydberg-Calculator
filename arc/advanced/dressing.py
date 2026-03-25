@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.constants import e as C_e, h as C_h, hbar
+from scipy.constants import e as C_e, h as C_h, hbar, pi
 from arc.alkali_atom_functions import *
 from arc.calculations_atom_pairstate import PairStateInteractions
 
