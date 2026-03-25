@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.constants import e as C_e, h as C_h, hbar
 from arc.alkali_atom_functions import *
 from arc.calculations_atom_pairstate import PairStateInteractions
-
 
 class DressedInteractions(PairStateInteractions):
 
@@ -72,7 +72,7 @@ class DressedInteractions(PairStateInteractions):
                             progressOutput=progressOutput,
                             forceNolimitMj=True, debugOutput=debugOutput)
 
-    def diagonalize(self, rangeR, noOfEigenvectors, eigenstateDetuning=0.,
+    def diagonalise(self, rangeR, noOfEigenvectors, eigenstateDetuning=0.,
                     sortEigenvectors=False, progressOutput=False,
                     debugOutput=False):
         """Finds eigenstates in the atom pair basis. Overloads the
@@ -80,7 +80,7 @@ class DressedInteractions(PairStateInteractions):
 
         """
 
-        super().diagonalize(rangeR, noOfEigenvectors,
+        super().diagonalise(rangeR, noOfEigenvectors,
                             drivingFromState=[0, 0, 0, 0, 0],
                             eigenstateDetuning=eigenstateDetuning,
                             sortEigenvectors=sortEigenvectors,
@@ -394,10 +394,9 @@ class DressedInteractions(PairStateInteractions):
 
         self.y = self.eigVals
         self.highlight = self.originalOverlap
-        vmax = 1.
 
         super().plotLevelDiagram(highlightColor=highlightColor,
-                                 highlightScale=highlightScale, vmax=vmax)
+                                 highlightScale=highlightScale)
 
     def plotLevelDiagramDressed(self, highlightColor='red',
                                 highlightScale='linear'):
@@ -419,9 +418,8 @@ class DressedInteractions(PairStateInteractions):
 
         self.y = self.eigValsExtended
         self.highlight = np.abs(self.pairRabiFreqs/(2*np.pi*1e3))  # in kHz
-        vmax = np.max(self.highlight)
         super().plotLevelDiagram(highlightColor=highlightColor,
-                                 highlightScale=highlightScale, vmax=vmax)
+                                 highlightScale=highlightScale)
         self.cb.set_label(r"$\Omega_\psi / 2 \pi$ (kHz)")
 
     def showPlot(self):

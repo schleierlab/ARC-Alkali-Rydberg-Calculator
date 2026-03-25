@@ -3317,6 +3317,9 @@ class PairStateInteractions:
         self.highlight = []
         # what are the dominant contributing states?
         self.composition = []
+        
+        # this should return the composition but as eigenvectors (with respect to basis states) instead of strings
+        self.eigVecs = []
 
         if noOfEigenvectors >= dimension - 1:
             noOfEigenvectors = dimension - 1
@@ -3506,6 +3509,7 @@ class PairStateInteractions:
                         abs(egvector[self.originalPairStateIndex, i]) ** 2
                     )
                     comp.append(self._stateComposition(egvector[:, i]))
+                    eigs.append(egvector[:, i])
                 self.highlight.append(sh)
                 self.composition.append(comp)
                 self.eigVecs.append(eigs)

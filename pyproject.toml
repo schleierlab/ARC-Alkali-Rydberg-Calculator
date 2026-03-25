@@ -66,6 +66,7 @@ dependencies = [
     "h5py>=3.11.0",
     "asteval>=1.0.6", # avoid upstream CVE-2025-24359
     "pillow>=12.1.1",
+    "pandas>=2.3.3",
 ]
 
 [project.readme]
